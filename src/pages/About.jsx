@@ -1,4 +1,3 @@
-import { Outlet } from "react-router-dom";
 import Wrapper from "../assets/wrappers/AboutPage";
 
 function About() {
