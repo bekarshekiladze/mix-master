@@ -6,7 +6,10 @@ import {
   HomeLayout,
   Landing,
   Newsletter,
+  SinglePageError,
 } from "./pages";
+
+import { loader as landingLoader } from "./pages/Landing.jsx";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +19,8 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        loader: landingLoader,
+        errorElement: <SinglePageError />,
         element: <Landing />,
       },
       {
