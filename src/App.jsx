@@ -10,6 +10,7 @@ import {
 } from "./pages";
 
 import { loader as landingLoader } from "./pages/Landing.jsx";
+import { loader as cocktailLoader } from "./pages/Cocktail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       {
         path: "cocktail/:id",
         element: <Cocktail />,
+        loader: cocktailLoader,
         errorElement: <SinglePageError />,
       },
       {

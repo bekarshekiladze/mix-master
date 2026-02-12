@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 
 function HomeLayout() {
   const navigation = useNavigation();
+
   const isPageLoading = navigation.state === "loading";
   const value = "some value";
   return (
