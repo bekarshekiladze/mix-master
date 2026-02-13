@@ -36,10 +36,6 @@ npm install
 npm run dev
 ```
 
-```env
-VITE_UNSPLASH_ACCESS_KEY={your_key}
-```
-
 ### Links
 
 [Live Site](https://mix-master-react-18.netlify.app/)
