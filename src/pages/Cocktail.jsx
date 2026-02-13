@@ -2,24 +2,40 @@ import axios from "axios";
 import { Link, useLoaderData } from "react-router-dom";
 import Wrapper from "../assets/wrappers/CocktailPage";
 import { Navigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const singleCocktailUrl =
   "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=";
 
-export const loader = async ({ params }) => {
-  const { id } = params;
-  const { data } = await axios.get(`${singleCocktailUrl}${id}`);
-  // throw new Error("artificial error from loader");
+const getCocktailQuery = (id) => {
+  return {
+    queryKey: ["cocktail", id],
+    queryFn: async () => {
+      const { data } = await axios.get(`${singleCocktailUrl}${id}`);
+      console.log(data);
 
-  return { id, data };
+      return data;
+    },
+  };
 };
 
+export const loader =
+  (queryClient) =>
+  async ({ params }) => {
+    const { id } = params;
+    await queryClient.ensureQueryData(getCocktailQuery(id));
+    return { id };
+  };
+
 function Cocktail() {
-  const { id, data } = useLoaderData();
-  // if (!data.drinks) return <h2>Something Went Wrong</h2>;
+  const { id } = useLoaderData();
+  const { data } = useQuery(getCocktailQuery(id));
+  console.log(data.drinks);
+
   if (!data.drinks) {
     return <Navigate to={"/"} />;
   }
+
   const singleDrink = data.drinks[0];
   const {
     strDrink: name,
