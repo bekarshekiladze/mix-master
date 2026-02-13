@@ -259,6 +259,8 @@ ul {
   outline: none;
 }
 .field-error {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
   color: var(--red-dark);
 }
 

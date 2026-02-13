@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Form, redirect, useNavigation } from "react-router-dom";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { toast } from "react-toastify";
 import validateFormEntries from "../utils/formValidation";
 import { useState } from "react";
@@ -10,18 +10,18 @@ export const action = async ({ request }) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
   try {
+    // validation, local error
     const fieldErrors = validateFormEntries(data);
     if (Object.keys(fieldErrors).length > 0) {
-      throw new Error(
-        `Form fields didn't pass form validation: ${fieldErrors}`,
-      );
+      return { fieldErrors, fieldValues: data };
     }
 
     const response = await axios.post(newsletterUrl, data);
     toast.success(response.data.msg);
     return redirect("/");
   } catch (error) {
-    console.log(error);
+    // action, server error
+    console.log({ error });
     toast.error(error?.response?.data?.msg);
     return error;
   }
@@ -34,11 +34,6 @@ function Newsletter() {
 
   // local state
   const [errors, setErrors] = useState({});
-  const [formValues, setFormValues] = useState({
-    name: "",
-    lastName: "",
-    email: "test@test.com",
-  });
 
   const handleSubmit = (e) => {
     const formData = new FormData(e.currentTarget);
@@ -53,10 +48,6 @@ function Newsletter() {
     } else {
       setErrors({});
     }
-  };
-
-  const handleChange = (e) => {
-    setFormValues({ ...formValues, [e.target.name]: e.target.value });
   };
 
   const inputClass = (name) =>
@@ -77,8 +68,6 @@ function Newsletter() {
           className={inputClass("name")}
           name="name"
           id="name"
-          value={formValues.name}
-          onChange={handleChange}
         />
         {errors.name && <p className="field-error">{errors.name}</p>}
       </div>
@@ -92,8 +81,6 @@ function Newsletter() {
           className={inputClass("lastName")}
           name="lastName"
           id="lastName"
-          onChange={handleChange}
-          value={formValues.lastName}
         />
         {errors.lastName && <p className="field-error">{errors.lastName}</p>}
       </div>
@@ -108,8 +95,6 @@ function Newsletter() {
           name="email"
           id="email"
           defaultValue="test@test.com"
-          onChange={handleChange}
-          value={formValues.email}
         />
         {errors.email && <p className="field-error">{errors.email}</p>}
       </div>
