@@ -1,7 +1,12 @@
 import { Form, useNavigation } from "react-router-dom";
 import Wrapper from "../assets/wrappers/SearchForm";
 import { useState } from "react";
-import validateSearchForm from "../utils/validateSearchForm";
+import validateForm from "../utils/formValidator/formValidator";
+import { isRequired, minLength } from "../utils/formValidator/fieldValidators";
+
+const searchValidationSchema = {
+  search: [isRequired, minLength(2)],
+};
 
 function SearchForm() {
   const navigation = useNavigation();
@@ -13,7 +18,7 @@ function SearchForm() {
     const formData = new FormData(e.currentTarget);
     const fieldValues = Object.fromEntries(formData);
 
-    const fieldErrors = validateSearchForm(fieldValues);
+    const fieldErrors = validateForm(fieldValues, searchValidationSchema);
 
     if (Object.keys(fieldErrors).length > 0) {
       e.preventDefault();
@@ -41,7 +46,7 @@ function SearchForm() {
           <button type="submit" className="btn" disabled={isSubmitting}>
             {isSubmitting ? "searching..." : "search"}
           </button>
-          {errors.search && <p className="field-error">{errors.search}</p>}
+          {errors.search && <p className="field-error">{errors.search[0]}</p>}
         </div>
       </Form>
     </Wrapper>

@@ -1,17 +1,27 @@
 import axios from "axios";
-import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
+import { Form, redirect, useNavigation } from "react-router-dom";
 import { toast } from "react-toastify";
-import validateFormEntries from "../utils/formValidation";
 import { useState } from "react";
+import {
+  isEmail,
+  isRequired,
+  minLength,
+} from "../utils/formValidator/fieldValidators";
+import validateForm from "../utils/formValidator/formValidator";
 
 const newsletterUrl = "https://www.course-api.com/cocktails-newsletter";
+const newsletterSchema = {
+  name: [isRequired, minLength(2)],
+  lastName: [isRequired, minLength(2)],
+  email: [isEmail],
+};
 
 export const action = async ({ request }) => {
   const formData = await request.formData();
-  const data = Object.fromEntries(formData);
+  const data = Object.fromEntries(formData, newsletterSchema);
   try {
-    // validation, local error
-    const fieldErrors = validateFormEntries(data);
+    // secondary validation, UI walkaround case
+    const fieldErrors = validateForm(data);
     if (Object.keys(fieldErrors).length > 0) {
       return { fieldErrors, fieldValues: data };
     }
@@ -21,7 +31,6 @@ export const action = async ({ request }) => {
     return redirect("/");
   } catch (error) {
     // action, server error
-    console.log({ error });
     toast.error(error?.response?.data?.msg);
     return error;
   }
@@ -34,12 +43,13 @@ function Newsletter() {
 
   // local state
   const [errors, setErrors] = useState({});
+  console.log({ errors });
 
   const handleSubmit = (e) => {
     const formData = new FormData(e.currentTarget);
     const fieldValues = Object.fromEntries(formData);
 
-    const fieldErrors = validateFormEntries(fieldValues);
+    const fieldErrors = validateForm(fieldValues, newsletterSchema);
 
     if (Object.keys(fieldErrors).length > 0) {
       e.preventDefault();
@@ -69,7 +79,7 @@ function Newsletter() {
           name="name"
           id="name"
         />
-        {errors.name && <p className="field-error">{errors.name}</p>}
+        {errors.name && <p className="field-error">{errors.name[0]}</p>}
       </div>
       {/* last name */}
       <div className="form-row">
@@ -82,7 +92,7 @@ function Newsletter() {
           name="lastName"
           id="lastName"
         />
-        {errors.lastName && <p className="field-error">{errors.lastName}</p>}
+        {errors.lastName && <p className="field-error">{errors.lastName[0]}</p>}
       </div>
       {/* email */}
       <div className="form-row">
@@ -90,7 +100,7 @@ function Newsletter() {
           email
         </label>
         <input
-          type="email"
+          type="text"
           className={inputClass("email")}
           name="email"
           id="email"
