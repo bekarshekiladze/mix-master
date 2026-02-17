@@ -40,6 +40,7 @@ html {
   --white: #fff;
   --red-light: #f8d7da;
   --red-dark: #842029;
+  --error-red: #b91048;
   --green-light: #d1e7dd;
   --green-dark: #0f5132;
 
@@ -255,13 +256,13 @@ ul {
 }
 /* form validation errors */
 .input-error {
-  border: 1px solid var(--red-dark);
+  border: 1px solid var(--error-red);
   outline: none;
 }
 .field-error {
   margin-top: 0.25rem;
   font-size: 0.85rem;
-  color: var(--red-dark);
+  color: var(--error-red);
 }
 
 /* alert */
