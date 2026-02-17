@@ -8,6 +8,8 @@ import {
   minLength,
 } from "../utils/formValidator/fieldValidators";
 import validateForm from "../utils/formValidator/formValidator";
+import fieldValidator from "../utils/formValidator/fieldValidator";
+import useFormValidator from "../utils/formValidator/useFormValidator";
 
 const newsletterUrl = "https://www.course-api.com/cocktails-newsletter";
 const newsletterSchema = {
@@ -18,10 +20,10 @@ const newsletterSchema = {
 
 export const action = async ({ request }) => {
   const formData = await request.formData();
-  const data = Object.fromEntries(formData, newsletterSchema);
+  const data = Object.fromEntries(formData);
   try {
     // secondary validation, UI walkaround case
-    const fieldErrors = validateForm(data);
+    const fieldErrors = validateForm(data, newsletterSchema);
     if (Object.keys(fieldErrors).length > 0) {
       return { fieldErrors, fieldValues: data };
     }
@@ -42,23 +44,8 @@ function Newsletter() {
   const isSubmitting = navigation.state === "submitting";
 
   // local state
-  const [errors, setErrors] = useState({});
-  console.log({ errors });
-
-  const handleSubmit = (e) => {
-    const formData = new FormData(e.currentTarget);
-    const fieldValues = Object.fromEntries(formData);
-
-    const fieldErrors = validateForm(fieldValues, newsletterSchema);
-
-    if (Object.keys(fieldErrors).length > 0) {
-      e.preventDefault();
-
-      setErrors(fieldErrors);
-    } else {
-      setErrors({});
-    }
-  };
+  const { errors, handleSubmit, handleBlur } =
+    useFormValidator(newsletterSchema);
 
   const inputClass = (name) =>
     `form-input ${errors[name] ? "input-error" : ""}`;
@@ -78,6 +65,7 @@ function Newsletter() {
           className={inputClass("name")}
           name="name"
           id="name"
+          onBlur={handleBlur}
         />
         {errors.name && <p className="field-error">{errors.name[0]}</p>}
       </div>
@@ -91,6 +79,7 @@ function Newsletter() {
           className={inputClass("lastName")}
           name="lastName"
           id="lastName"
+          onBlur={handleBlur}
         />
         {errors.lastName && <p className="field-error">{errors.lastName[0]}</p>}
       </div>
@@ -105,8 +94,9 @@ function Newsletter() {
           name="email"
           id="email"
           defaultValue="test@test.com"
+          onBlur={handleBlur}
         />
-        {errors.email && <p className="field-error">{errors.email}</p>}
+        {errors.email && <p className="field-error">{errors.email[0]}</p>}
       </div>
       {/* submit */}
       <button
